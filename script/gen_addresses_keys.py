@@ -1,4 +1,4 @@
-import eth_keys, eth_utils, binascii, os, pickle, eth_abi
+import eth_keys, binascii, pickle, eth_abi
 
 class PrivateKeys():
     def __init__(self, priv_key_1, priv_key_2, priv_key_3, priv_key_4):
