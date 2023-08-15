@@ -1,9 +1,12 @@
-// SPDX-License-Identifier: BUSL-1.1
 pragma solidity =0.8.19;
 
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
+/**
+ * @title MultiSig
+ * @notice Distributed as part of a coding challenge. For educational purposes only.
+ */
 contract MultiSig is Ownable {
     receive() external payable {}
 
@@ -12,8 +15,8 @@ contract MultiSig is Ownable {
 
     struct Signer {
         address addr;
-        uint8 index; 
-        uint8 group; 
+        uint8 index;
+        uint8 group;
     }
 
     struct Call {
@@ -34,29 +37,27 @@ contract MultiSig is Ownable {
 
     mapping(bytes32 => bool) s_seenSignedHashes;
 
-
     struct Signature {
         uint8 v;
         bytes32 r;
         bytes32 s;
     }
 
-    function hashOperationBatch(
-        Call[] calldata calls,
-        bytes32 predecessor,
-        bytes32 salt
-    ) public pure virtual returns (bytes32 hash) {
+    function hashOperationBatch(Call[] calldata calls, bytes32 predecessor, bytes32 salt)
+        public
+        pure
+        virtual
+        returns (bytes32 hash)
+    {
         return keccak256(abi.encode(calls, predecessor, salt));
     }
-    
-    function executeBatch(
-        Call[] calldata calls,
-        bytes32 predecessor,
-        bytes32 salt,
-        Signature[] calldata signatures
-    ) public payable virtual {
-        bytes32 signedHash = hashOperationBatch(calls, predecessor, salt);
 
+    function executeBatch(Call[] calldata calls, bytes32 predecessor, bytes32 salt, Signature[] calldata signatures)
+        public
+        payable
+        virtual
+    {
+        bytes32 signedHash = hashOperationBatch(calls, predecessor, salt);
 
         if (s_seenSignedHashes[signedHash]) {
             revert SignedHashAlreadySeen();
@@ -66,9 +67,9 @@ contract MultiSig is Ownable {
             Signer memory signer;
             address prevAddress = address(0x0);
             uint8[NUM_GROUPS] memory groupVoteCounts;
-            for (uint256 i = 0; i < signatures.length; i++) { 
+            for (uint256 i = 0; i < signatures.length; i++) {
                 Signature calldata sig = signatures[i];
-                        
+
                 address signerAddress = ECDSA.recover(signedHash, sig.v, sig.r, sig.s);
 
                 prevAddress = signerAddress;
@@ -80,7 +81,7 @@ contract MultiSig is Ownable {
                 uint8 group = signer.group;
                 while (true) {
                     groupVoteCounts[group]++;
-                    if (groupVoteCounts[group] != s_config.groupQuorums[group]) { 
+                    if (groupVoteCounts[group] != s_config.groupQuorums[group]) {
                         break;
                     }
                     if (group == 0) {
@@ -90,28 +91,26 @@ contract MultiSig is Ownable {
                     group = s_config.groupParents[group];
                 }
             }
-                    
-                if (s_config.groupQuorums[0] == 0) {
-                    revert MissingConfig();
-                }
-                    
-                if (groupVoteCounts[0] < s_config.groupQuorums[0]) {
-                    revert InsufficientSigners();
-                }
+
+            if (s_config.groupQuorums[0] == 0) {
+                revert MissingConfig();
             }
 
-            s_seenSignedHashes[signedHash] = true;
-                
-            for (uint256 i = 0; i < calls.length; ++i) {
-                _execute(calls[i]);
-                emit CallExecuted(signedHash, i, calls[i].target, calls[i].value, calls[i].data);
+            if (groupVoteCounts[0] < s_config.groupQuorums[0]) {
+                revert InsufficientSigners();
             }
+        }
+
+        s_seenSignedHashes[signedHash] = true;
+
+        for (uint256 i = 0; i < calls.length; ++i) {
+            _execute(calls[i]);
+            emit CallExecuted(signedHash, i, calls[i].target, calls[i].value, calls[i].data);
+        }
     }
 
-    function _execute(
-        Call calldata call
-    ) internal virtual {
-        (bool success, ) = call.target.call{value: call.value}(call.data);
+    function _execute(Call calldata call) internal virtual {
+        (bool success,) = call.target.call{value: call.value}(call.data);
         require(success, "underlying transaction reverted");
     }
 
@@ -130,7 +129,6 @@ contract MultiSig is Ownable {
         }
 
         {
-
             uint8[NUM_GROUPS] memory groupChildrenCounts;
 
             for (uint256 i = 0; i < signerGroups.length; i++) {
@@ -152,7 +150,6 @@ contract MultiSig is Ownable {
                         revert SignerInDisabledGroup();
                     }
                 } else {
-
                     if (groupChildrenCounts[i] < groupQuorums[i]) {
                         revert OutOfBoundsGroupQuorum();
                     }
@@ -169,16 +166,13 @@ contract MultiSig is Ownable {
             s_config.signers.pop();
         }
 
-
         assert(s_config.signers.length == 0);
         s_config.groupQuorums = groupQuorums;
         s_config.groupParents = groupParents;
 
-
         address prevSigner = address(0x0);
         for (uint256 i = 0; i < signerAddresses.length; i++) {
-            Signer memory signer =
-                Signer({addr: signerAddresses[i], index: uint8(i), group: signerGroups[i]});
+            Signer memory signer = Signer({addr: signerAddresses[i], index: uint8(i), group: signerGroups[i]});
             s_signers[signerAddresses[i]] = signer;
             s_config.signers.push(signer);
             prevSigner = signerAddresses[i];
@@ -190,7 +184,6 @@ contract MultiSig is Ownable {
     function getConfig() public view returns (Config memory) {
         return s_config;
     }
-
 
     /*
     * Events and Errors
@@ -219,5 +212,4 @@ contract MultiSig is Ownable {
     error MissingConfig();
 
     error SignedHashAlreadySeen();
-
 }

@@ -1,0 +1,9 @@
+cytoolz==0.12.2
+eth-abi==4.1.0
+eth-hash==0.5.2
+eth-keys==0.4.0
+eth-typing==3.4.0
+eth-utils==2.2.0
+parsimonious==0.9.0
+regex==2023.8.8
+toolz==0.12.0
