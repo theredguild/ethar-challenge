@@ -21,14 +21,14 @@ Los ganadores serán anunciados al final de la conferencia.
 ## Requisitos
 
 - [Foundry](https://book.getfoundry.sh/), para la ejecución del challenge.
-- [Python](https://www.python.org/downloads/), para la generación local de llaves de prueba.
+- [Python](https://www.python.org/downloads/), para el uso de llaves privadas de prueba.
 
 ## Setup
 
 1. Cloná este repositorio
 
 ```
-git clone https://github.com/ethereum-argentina/challenge
+git clone https://github.com/ethereum-argentina/coding-challenge
 ```
 
 2. Instalá las dependencias
@@ -37,10 +37,12 @@ git clone https://github.com/ethereum-argentina/challenge
 pip install -r requirements.txt
 ```
 
-3. Ejecutá el desafío
+3. Probá que todo funcione bien 
 
 ```
 forge test
 ```
 
-4. Encontrá la vulnerabilidad del contrato `MultiSig`, y modificá el archivo de test `MultiSig.t.sol` de tal forma que cumplas con el objetivo.
+4. Mirá y guardá tu número único de ticket para el sorteo! Lo vas a encontrar en el archivo generado en el directorio raiz del desafío.
+
+5. Encontrá la falla del contrato `MultiSig`, y modificá el archivo de test `MultiSig.t.sol` de tal forma que cumplas con el objetivo. Vas a necesitar mostrar la solución para que te otorguemos el premio si tu número de ticket es el ganador del sorteo.
