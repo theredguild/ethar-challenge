@@ -46,6 +46,9 @@ forge test
 4. Mirá y guardá tu número único de ticket para el sorteo! Lo vas a encontrar en el archivo generado en el directorio raiz del desafío.
 
 5. Encontrá la falla del contrato `MultiSig`, y modificá el archivo de test `MultiSig.t.sol` de tal forma que cumplas con el objetivo. Vas a necesitar mostrar la solución para que te otorguemos el premio si tu número de ticket es el ganador del sorteo.
+<<<<<<< HEAD
 
 
 SPAWNED#############################################################################################
+=======
+>>>>>>> 7d3578b5cf97248db4fbdc61cd5eb8303a5ee4a5
